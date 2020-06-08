@@ -1,0 +1,41 @@
+version: '3.1'
+
+services: 
+  mongo: 
+    image: mongo
+    restart: always
+    expose:
+      - "27017"
+    ports: 
+      - "4505:27017"
+    networks:
+      - apinet
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: mypassword
+    volumes:
+      - mongo-volume:/data/db
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile_nginx
+    ports:
+      - '80:80'
+    networks:
+      - apinet
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile_flask
+    expose:
+      - "5000"
+    environment: 
+      MONGO_URL: mongodb://root:mypassword@mongo:27017/admin
+    networks:
+      - apinet
+
+
+networks:
+  apinet:
+volumes:
+  mongo-volume:
